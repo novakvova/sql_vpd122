@@ -13,8 +13,8 @@ namespace CRUD_Database
         private SqlConnection con;
         public UserManager()
         {
-            con = new SqlConnection(strCon);
-            con.Open();
+            //con = new SqlConnection(strCon);
+            //con.Open();
         }
         public List<User> Users
         {
@@ -40,6 +40,52 @@ namespace CRUD_Database
         }
 
 
+        public void CreateDatabase()
+        {
+            try
+            {
+                string strCon = "Data Source=.;Integrated Security=True";
+                string strQuery = "CREATE DATABASE new";
+                using (con = new SqlConnection(strCon))
+                {
+                    SqlCommand cmd = new SqlCommand(strQuery, con);
+                    cmd.Connection.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+            
+        }
+
+        public void CreateTableDatabase()
+        {
+            string strCon = "Data Source = .; Integrated security = true; database = New";
+            string strQuery = "CREATE TABLE tblUsers(ID INT NOT NULL IDENTITY (1,1) PRIMARY KEY," +
+                        "EMAIL NVARCHAR(50) NOT NULL CHECK(EMAIL <> N'')," +
+                        "FIRSTNAME NVARCHAR(50) NOT NULL CHECK(FIRSTNAME <> N'')," +
+                        "LASTNAME NVARCHAR(50) NOT NULL CHECK(LASTNAME <> N''))" +
+                        "CREATE TABLE tblRoles(ID INT NOT NULL IDENTITY (1,1) PRIMARY KEY," +
+                        "NAME NVARCHAR(50) NOT NULL CHECK(NAME <> N''))" +
+                        "CREATE TABLE tblUserRoles(ID INT NOT NULL IDENTITY(1,1) PRIMARY KEY," +
+                        "USERID INT NOT NULL UNIQUE FOREIGN KEY REFERENCES tblUsers(ID)," +
+                        "ROLEID INT NOT NULL UNIQUE FOREIGN KEY REFERENCES tblRoles(ID)) ";
+            using (con = new SqlConnection(strCon))
+            {
+                SqlCommand cmdCT = new SqlCommand(strQuery, con);
+                cmdCT.Connection.Open();
+                try
+                {
+                    cmdCT.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+        }
         public User Create(UserCreate user)
         {
             string sql = $"INSERT INTO tblUsers ([Email],[FirstName],[LastName]) VALUES (N'{user.Email}',N'{user.FirstName}',N'{user.LastName}');" +
