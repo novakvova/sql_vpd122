@@ -181,8 +181,15 @@ namespace CRUD_Database
                             searchUser.FirstName = Console.ReadLine();
                             Console.Write("Вкажіть пошту: ");
                             searchUser.Email = Console.ReadLine();
-                            var users = userManager.SearchUsers(searchUser);
-                            Console.WriteLine("Search list: {0}", users.Count);
+                            Console.WriteLine("Enter page number: \n");
+                            int page = int.Parse(Console.ReadLine());
+                            int count;
+                            var users = userManager.SearchUsers(searchUser, out count, page);
+                            Console.WriteLine("Read data list: {0}", count);
+                            foreach (var user in users)
+                            {
+                                Console.WriteLine(user);
+                            }
                             stopWatch.Stop();
                             // Get the elapsed time as a TimeSpan value.
                             TimeSpan ts = stopWatch.Elapsed;

@@ -39,24 +39,40 @@ namespace CRUD_Database
             }
         }
 
-        public List<User> SearchUsers(SearchUser searchUser)
+        public List<User> SearchUsers(SearchUser searchUser, out int count, int page=1)
         {
+            count = 10;
             List<User> users = new List<User>();
+            var query = "";
             string sql = "Select * from tblUsers";
             bool isWhere = false;
             if(!string.IsNullOrEmpty(searchUser.FirstName))
             {
-                sql += $" Where FirstName Like '%{searchUser.FirstName}%'";
+                query += $" Where FirstName Like '%{searchUser.FirstName}%'";
                 isWhere = true;
             }
             if(!string.IsNullOrEmpty(searchUser.Email))
             {
                 if(isWhere)
-                    sql += $"  AND Email Like '%{searchUser.Email}%'";
+                    query += $"  AND Email Like '%{searchUser.Email}%'";
                 else
-                    sql += $"  Where Email Like '%{searchUser.Email}%'";
+                    query += $"  Where Email Like '%{searchUser.Email}%'";
                 isWhere = true;
             }
+            //кількість запитсів, по запиту
+            string queryCount = "Select count(*) as count From tblUsers"+ query;
+            using (SqlCommand cmd = new SqlCommand(queryCount, con))
+            {
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        count = int.Parse(dr["count"].ToString());
+                    }
+                }
+            }
+            int rows = (page - 1) * 20;
+            sql = sql + query + $" Order by Id  offset {rows} rows  fetch next 20 rows only; ";
 
             using (SqlCommand cmd = new SqlCommand(sql, con))
             {
