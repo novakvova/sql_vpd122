@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace CRUD_Database
 {
-    public class UserCreate
+    public class SearchUser
     {
         public string Email { get; set; }
         public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public override string ToString()
-        {
-            return $"Name: {FirstName} {LastName}\t Email: {Email}";
-        }
     }
 }

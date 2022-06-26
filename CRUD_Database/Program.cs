@@ -1,6 +1,8 @@
-﻿
-using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Diagnostics;
 using System.Text;
+using Bogus;
+using Microsoft.Extensions.Configuration;
 
 namespace CRUD_Database
 {
@@ -99,6 +101,7 @@ namespace CRUD_Database
         {
             string conectionSTR = $"{conSTR}Initial Catalog={dbName}";
             TableManager tableManager = new TableManager(conectionSTR);
+            UserManager userManager = new UserManager(conectionSTR);
             int action = 0;
             do
             {
@@ -109,6 +112,7 @@ namespace CRUD_Database
                 Console.WriteLine("4. Показати продукти");
                 Console.WriteLine("5. Заповнити даними за допомогою SP");
                 Console.WriteLine("6. Провести операцію в транзації");
+                Console.WriteLine("7. Пошук даних");
                 action = int.Parse(Console.ReadLine());
                 switch (action)
                 {
@@ -124,7 +128,32 @@ namespace CRUD_Database
                         }
                     case 3:
                         {
-                           
+                            var faker = new Faker<UserCreate>("uk")
+                                .RuleFor(x=>x.FirstName, f=>f.Person.FirstName)
+                                .RuleFor(x=>x.LastName, f=>f.Person.LastName)
+                                .RuleFor(x=>x.Email, f=>f.Internet.Email());
+                            
+                            Console.WriteLine("Кількість даних для додавання:");
+                            int count = int.Parse(Console.ReadLine());
+                            var list = new List<UserCreate>();
+                            for (int i = 0; i < count; i++)
+                            {
+                                var user = faker.Generate();
+                                list.Add(user);
+                            }
+                            Stopwatch stopWatch = new Stopwatch();
+                            stopWatch.Start();
+                            userManager.CreateListUsers(list);
+                            stopWatch.Stop();
+                            // Get the elapsed time as a TimeSpan value.
+                            TimeSpan ts = stopWatch.Elapsed;
+
+                            // Format and display the TimeSpan value.
+                            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                                ts.Hours, ts.Minutes, ts.Seconds,
+                                ts.Milliseconds / 10);
+                            Console.WriteLine("RunTime " + elapsedTime);
+
                             break;
                         }
                     case 4:
@@ -140,6 +169,18 @@ namespace CRUD_Database
                     case 6:
                         {
                             
+                            break;
+                        }
+
+                    case 7:
+                        {
+                            SearchUser searchUser = new SearchUser();
+                            Console.Write("Вкажіть ім'я користувача: ");
+                            searchUser.FirstName = Console.ReadLine();
+                            Console.Write("Вкажіть пошту: ");
+                            searchUser.Email = Console.ReadLine();
+                            var users = userManager.SearchUsers(searchUser);
+                            Console.WriteLine("Search list: {0}", users.Count);
                             break;
                         }
                 }
