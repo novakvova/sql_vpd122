@@ -99,15 +99,18 @@ namespace CRUD_Database
         public void CreateListUsers(List<UserCreate> users)
         {
             DataTable dt = new DataTable();
-            dt.Columns.Add(new DataColumn("Email", typeof(string)));
-            dt.Columns.Add(new DataColumn("FirstName", typeof(string)));
-            dt.Columns.Add(new DataColumn("LastName", typeof(string)));
+            dt.TableName = "tblUsers";
+            dt.Columns.Add(new DataColumn("Id"));
+            dt.Columns.Add(new DataColumn(nameof(UserCreate.Email)));
+            dt.Columns.Add(new DataColumn(nameof(UserCreate.FirstName)));
+            dt.Columns.Add(new DataColumn(nameof(UserCreate.LastName)));
             foreach (var user in users)
             {
                 DataRow row = dt.NewRow();
-                row["Email"] = user.Email;
-                row["FirstName"] = user.FirstName;
-                row["LastName"] = user.LastName;
+                row["Id"] = 0;
+                row[nameof(UserCreate.Email)]= user.Email;
+                row[nameof(UserCreate.FirstName)] = user.FirstName;
+                row[nameof(UserCreate.LastName)]  = user.LastName;
                 dt.Rows.Add(row);
             }
 
