@@ -99,7 +99,7 @@ namespace CRUD_Database
 
         static void WorkTabelsInDB(string conSTR, string dbName)
         {
-            string conectionSTR = $"{conSTR}Initial Catalog={dbName}";
+            string conectionSTR = $"{conSTR}Initial Catalog={dbName}; Connect Timeout=120;";
             TableManager tableManager = new TableManager(conectionSTR);
             UserManager userManager = new UserManager(conectionSTR);
             int action = 0;
@@ -174,6 +174,8 @@ namespace CRUD_Database
 
                     case 7:
                         {
+                            Stopwatch stopWatch = new Stopwatch();
+                            stopWatch.Start();
                             SearchUser searchUser = new SearchUser();
                             Console.Write("Вкажіть ім'я користувача: ");
                             searchUser.FirstName = Console.ReadLine();
@@ -181,6 +183,15 @@ namespace CRUD_Database
                             searchUser.Email = Console.ReadLine();
                             var users = userManager.SearchUsers(searchUser);
                             Console.WriteLine("Search list: {0}", users.Count);
+                            stopWatch.Stop();
+                            // Get the elapsed time as a TimeSpan value.
+                            TimeSpan ts = stopWatch.Elapsed;
+
+                            // Format and display the TimeSpan value.
+                            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                                ts.Hours, ts.Minutes, ts.Seconds,
+                                ts.Milliseconds / 10);
+                            Console.WriteLine("RunTime " + elapsedTime);
                             break;
                         }
                 }
